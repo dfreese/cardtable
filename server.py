@@ -26,13 +26,13 @@
 #
 ###############################################################################
 
-import sys
+# import sys
 import json
 
-from twisted.internet import reactor
-from twisted.python import log
-from twisted.web.server import Site
-from twisted.web.static import File
+# from twisted.internet import reactor
+# from twisted.python import log
+# from twisted.web.server import Site
+# from twisted.web.static import File
 
 from autobahn.twisted.websocket import (
     WebSocketServerFactory,
@@ -138,11 +138,11 @@ class BroadcastServerFactory(WebSocketServerFactory):
 
 if __name__ == '__main__':
 
-    if len(sys.argv) > 1 and sys.argv[1] == 'debug':
-        log.startLogging(sys.stdout)
-        debug = True
-    else:
-        debug = False
+#     if len(sys.argv) > 1 and sys.argv[1] == 'debug':
+#         log.startLogging(sys.stdout)
+#         debug = True
+#     else:
+    debug = False
 
     ServerFactory = BroadcastServerFactory
 
@@ -153,8 +153,7 @@ if __name__ == '__main__':
     factory.protocol = BroadcastServerProtocol
     listenWS(factory)
 
-    webdir = File(".")
-    web = Site(webdir)
-    reactor.listenTCP(8080, web)
-
-    reactor.run()
+#     webdir = File(".")
+#     web = Site(webdir)
+#     reactor.listenTCP(8080, web)
+#     reactor.run()
