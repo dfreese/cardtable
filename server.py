@@ -71,11 +71,8 @@ class BroadcastServerFactory(WebSocketServerFactory):
     currently connected clients.
     """
 
-    def __init__(self, url, debug=False, debugCodePaths=False):
-        WebSocketServerFactory.__init__(self,
-                                        url,
-                                        debug=debug,
-                                        debugCodePaths=debugCodePaths)
+    def __init__(self, url):
+        WebSocketServerFactory.__init__(self, url)
         self.game = game.Game()
         self.names = []
         self.clients = []
@@ -137,19 +134,7 @@ class BroadcastServerFactory(WebSocketServerFactory):
         self.send_players()
 
 if __name__ == '__main__':
-
-#     if len(sys.argv) > 1 and sys.argv[1] == 'debug':
-#         log.startLogging(sys.stdout)
-#         debug = True
-#     else:
-    debug = False
-
-    ServerFactory = BroadcastServerFactory
-
-    factory = ServerFactory(u"ws://127.0.0.1:9000",
-                            debug=debug,
-                            debugCodePaths=debug)
-
+    factory = BroadcastServerFactory(u"ws://127.0.0.1:9000")
     factory.protocol = BroadcastServerProtocol
     listenWS(factory)
 
