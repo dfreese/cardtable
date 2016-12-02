@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <script type="text/javascript">
+          var sock = null;
+          var player_id = -1;
+          var context_clicked_card = "";
+          function send_move(from_id, to_id) {
+             var msg = "{\"game\": { \"moves\" : [{\"from\": \"" + from_id + "\", \"to\": \"" + to_id + "\"}]} }";
+             send_msg(msg)
+          };
+
+          function send_flip(stack) {
+              var msg = "{\"game\": {\"flip\" : \"" + stack + "\"}}";
+              send_msg(msg)
+          };
+
+          function send_shuffle(id) {
+              var msg = "{\"game\": {\"shuffle\" : \"" + id + "\"}}";
+              send_msg(msg)
+          };
+
+          function send_deal(id, no_cards) {
+              var msg = "{\"game\": {\"deal\" : {\"id\": \"" + id + "\", \"no_cards\": \"" + no_cards + "\"}}}";
+              send_msg(msg)
+          };
+
+          function cardContextClicked(ev) {
+              event.preventDefault();
+              var ctxMenu = document.getElementById("ctxMenu");
+              ctxMenu.style.display = "block";
+              ctxMenu.style.left = (event.pageX - 10) + "px";
+              ctxMenu.style.top = (event.pageY - 10) + "px";
+              context_clicked_card = ev.target.id;
+          };
+
+          function cardClicked() {
+              var ctxMenu = document.getElementById("ctxMenu");
+              ctxMenu.style.display = "";
+              ctxMenu.style.left = "";
+              ctxMenu.style.top = "";
+              context_clicked_card = "";
+          };
+
+          function flip(ev) {
+              var id = ev.target.id;
+              send_flip(ev.target.id);
+          };
+
+          function flip_stack(ev) {
+              send_flip(context_clicked_card.split('c')[0]);
+              cardClicked();
+          };
+
+          function shuffle() {
+              send_shuffle(context_clicked_card);
+              cardClicked();
+          };
+
+          function deal_cards(no_cards) {
+              send_deal(context_clicked_card, no_cards);
+              cardClicked();
+          }
+
+          function get_card_name(card) {
+              var str = "cards/" + card.value + "_of_" + card.suit + ".png"
+              return(str)
+          };
+
+          function allowDrop(ev) {
+              ev.preventDefault();
+          }
+
+          function drag(ev) {
+              ev.dataTransfer.setData("text", ev.target.id);
+          }
+
+          function drop(ev) {
+              ev.preventDefault();
+              var data = ev.dataTransfer.getData("text");
+              console.log("data: " + data);
+              var div = document.getElementById(data);
+              div.id = ev.target.id + 'c' + div.id.split('c').slice(-1)[0];
+              console.log("div.id: " + div.id);
+              ev.target.appendChild(div);
+              send_move(data, ev.target.id)
+          }
+
+          function create_cards(table) {
+              var text = "<div class=\"table\">";
+              console.log('table.stacks.length: ' + table.stacks.length)
+              for (ii = 0; ii < table.stacks.length; ii++) {
+                  var stack = table.stacks[ii]
+                  var stack_name = "s" + ii
+                  text += "<div class=\"stack\" id=\"" + stack_name + "\" ondrop=\"drop(event)\" ondragover=\"allowDrop(event)\">"
+                  text += '(' + stack.cards.length + ')'
+                  if (stack.cards.length > 0) {
+                      var show_no_cards = 3;
+                      if (ii == 0) {
+                          show_no_cards = 1;
+                      }
+                      var start_idx = stack.cards.length - show_no_cards;
+                      if (start_idx < 0) {
+                          start_idx = 0;
+                      }
+                      var row_offset = 50;
+                      for (jj = start_idx; jj < stack.cards.length; jj++) {
+                          var image_name = "cards/back.png";
+                          var card = stack.cards[jj];
+                          if (card.face_up) {
+                              image_name = get_card_name(card);
+                          }
+                          var card_name = stack_name + "c" + jj;
+                          var card_col = 0;
+                          var card_row = (jj - card_col - start_idx);
+                          var z_idx = 90 + card_row;
+                          var top_offset = 20 + row_offset * card_row;
+                          var style = "position: absolute; z-index: " + z_idx + "; top: " + top_offset + "px; left: 0";
+                          text += "<img class=\"card\" id=\"" + card_name + "\" src=\"" + image_name + "\" style=\"" + style + "\" draggable=\"true\" ondblclick=\"flip(event)\" ondragstart=\"drag(event)\" oncontextmenu=\"cardContextClicked(event)\" onclick=\"cardClicked()\"></img>"
+                      }
+                  }
+                  text += "</div>"
+              }
+              text += "</div>"
+              return text
+          }
+
+          function create_hand(hands, width) {
+              var stack_name = "h" + player_id
+              var text = "<div class=\"hand\" id=\"" + stack_name + "\" ondrop=\"drop(event)\" ondragover=\"allowDrop(event)\">";
+              var hand = hands[player_id];
+              var no_cards_per_row = (width / 167.0);
+              no_cards_per_row -= no_cards_per_row % 1.0;
+              no_cards_per_row -= 1;
+              console.log('width: ' + width)
+              console.log('no_cards_per_row: ' + no_cards_per_row)
+              var row_offset = 60;
+              var col_offset = 167;
+
+              for (ii = 0; ii < hand.cards.length; ii++) {
+                  var image_name = "cards/back.png";
+                  var card = hand.cards[ii];
+                  if (card.face_up) {
+                      image_name = get_card_name(card);
+                  }
+                  var card_name = stack_name + "c" + ii;
+                  var card_col = ii % no_cards_per_row;
+                  var card_row = (ii - card_col) / no_cards_per_row;
+                  var z_idx = 90 + card_row;
+                  var top_offset = row_offset * card_row;
+                  var left_offset = col_offset * card_col;
+                  var style = "position: absolute; z-index: " + z_idx + "; top: " + top_offset + "px; left: " + left_offset + "px;";
+                  text += "<img class=\"card\" id=\"" + card_name + "\" src=\"" + image_name + "\" style=\"" + style + "\" draggable=\"true\" ondblclick=\"flip(event)\" ondragstart=\"drag(event)\"></img>";
+              }
+              text += "</div>"
+              return text
+          }
+
+          function create_players(players) {
+              var text = "";
+              for (ii = 0; ii < players.length; ii++) {
+                  if (ii == player_id) {
+                      text += "<div style=\"background-color: #8C1515; color: #DAD7CB;\" class=\"player\">" + players[ii].name + "</div>";
+                  } else {
+                      text += "<div class=\"player\">" + players[ii].name + "</div>";
+                  }
+              }
+              return text
+          }
+
+         window.onload = function() {
+
+            var wsuri;
+
+            if (window.location.protocol === "file:") {
+                wsuri = "ws://localhost:9000";
+            } else {
+                wsuri = "ws://98.234.179.121:9000";
+            }
+
+            if ("WebSocket" in window) {
+               sock = new WebSocket(wsuri);
+            } else if ("MozWebSocket" in window) {
+               sock = new MozWebSocket(wsuri);
+            } else {
+               console.log("Browser does not support WebSocket!");
+               window.location = "http://autobahn.ws/unsupportedbrowser";
+            }
+
+            if (sock) {
+               sock.onopen = function() {
+                  console.log("Connected to " + wsuri);
+               }
+
+               sock.onclose = function(e) {
+                  console.log("Connection closed (wasClean = " + e.wasClean +
+                        ", code = " + e.code + ", reason = '" + e.reason +
+                        "')");
+                  sock = null;
+               }
+
+               sock.onmessage = function(e) {
+                  console.log("Got echo: " + e.data);
+                  parsed_json = JSON.parse(e.data);
+                  if ('player_id' in parsed_json) {
+                      player_id = parsed_json.player_id;
+                  }
+                  if ('players' in parsed_json) {
+                      document.getElementById('scoreboard').innerHTML = create_players(parsed_json.players);
+                  }
+                  if ('game_state' in parsed_json) {
+                      var game_state = parsed_json.game_state
+                      if ('table' in game_state) {
+                          document.getElementById('gamestate').innerHTML = create_cards(game_state.table);
+                      }
+                      if ('hands' in game_state) {
+                          document.getElementById('hands').innerHTML = create_hand(game_state.hands, document.getElementById('hands').clientWidth);
+                      }
+                  }
+                  if ('command' in parsed_json) {
+                      if (parsed_json.command == 'game_over') {
+                          game_over();
+                      }
+                  }
+               }
+            }
+         };
+
+         function send_name() {
+            var name = document.getElementById('name').value;
+            var msg = "{\"name\": \"" + name + "\"}";
+            send_msg(msg)
+         };
+
+         function send_msg(msg) {
+            if (sock) {
+               sock.send(msg);
+               console.log("Sent: " + msg);
+            } else {
+               console.log("Not connected.");
+            }
+         };
+
+      </script>
+     <link rel="stylesheet" type="text/css" href="style.css"/>
+     <title>Play Cards</title>
+   </head>
+   <body>
+      <noscript>You must enable JavaScript</noscript>
+      <div id="scores">
+          <input id="name" type="text" size="50" maxlength="50" value="Name">
+          <input type="button" id="button_name" onclick='send_name();' value='Send Name'>
+          <p></p>
+          <div id="scoreboard"></div>
+      </div>
+      <div class="menuholder" id="ctxMenu">
+          <div class="menu" title="Shuffle" onclick="shuffle()"></div>
+          <div class="menu" title="Deal">
+              <div class="menu" title="1" onclick="deal_cards(1)"></div>
+              <div class="menu" title="2" onclick="deal_cards(2)"></div>
+              <div class="menu" title="3" onclick="deal_cards(3)"></div>
+              <div class="menu" title="4" onclick="deal_cards(4)"></div>
+              <div class="menu" title="5" onclick="deal_cards(5)"></div>
+          </div>
+          <div class="menu" title="Flip" onclick="flip_stack()"></div>
+      </div>
+      <div id="gamestate"></div>
+      <div id="hands"></div>
+   </body>
+</html>

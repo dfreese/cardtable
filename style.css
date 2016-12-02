@@ -1,0 +1,129 @@
+body {
+    font-size:  1.0em;
+    font-family: Georgia;
+    text-align:  left;
+    float: left;
+    width: 100%;
+    background-color: #DAD7CB;
+}
+
+button {
+    font-size: 1cm;
+    padding: 10px;
+}
+
+div.player {
+    border: 5px solid black;
+    padding: 20px;
+    font-size: 1cm;
+}
+
+#scores {
+    float: right;
+    position: fixed;
+    top: 2cm + 1px;
+    right: 30px;
+    max-width: 14%;
+}
+
+
+#scoreboard {
+    position: fixed;
+    top: 2cm + 1px;
+    right: 30px;
+}
+
+#gamestate {
+    max-width: 70%;
+    background-color: #D2C295;
+}
+
+#hands {
+
+}
+
+div.hand {
+    border: 1px solid black;
+    width: 90%;
+    height: 150px;
+    position: fixed;
+    bottom: 1px;
+    right: 30px;
+    padding: 5px;
+    background-color: #8C1515;
+}
+
+div.hand.card {
+    height: auto;
+    width: auto
+}
+
+div.table {
+    /*height: 700px;*/
+    /*width: 1150px;*/
+    background-color: #B6B1A9;
+}
+
+div.stack {
+    border: 1px solid black;
+    /*max-width: 3cm;*/
+    /*max-height: 5cm;*/
+    /*height: 350px;*/
+    /*width: 230px;*/
+    height: 363px;
+    /*height: 263px;*/
+    width: 173px;
+    float: left;
+    position: relative;
+    background-color: #B6B1A9;
+}
+
+img.card {
+    /*height: 312px;*/
+    height: 234px;
+    /*width: 223px;*/
+    width: 167px;
+}
+
+/*#card {
+    font-size: 0.25cm;
+}*/
+
+/* Context Menu Stuff */
+#ctxMenu {
+  display: none;
+  z-index: 100;
+}
+
+div.menuholder {
+  position: absolute;
+  display: block;
+}
+
+div.menu {
+  height: 20px;
+  width: 70px;
+  padding: 5px;
+  border: 1px solid;
+  background-color: white;
+}
+
+div.menu:hover {
+  font-weight: bold;
+}
+
+div.menu:hover > div.menu {
+  display: block;
+}
+
+div.menu > div.menu {
+  display: none;
+  position: relative;
+  top: -20px;
+  left: 75px;
+  height: 15px;
+}
+
+div.menu[title]:before {
+  content: attr(title);
+}
