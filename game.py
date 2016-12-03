@@ -218,3 +218,14 @@ class Game:
                             hand.push_card(stack.pop_card())
             elif id_split[0][0] == 'h':
                 pass
+
+        if 'reset' in cmds:
+            deck = self.table[0]
+            for hand in self.hands:
+                for ii in range(len(hard.cards)):
+                    deck.push_card(hand.pop_card())
+            for stack in self.table.stacks:
+                for ii in range(len(stack.cards)):
+                    deck.push_card(stack.pop_card())
+            deck.shuffle()
+

@@ -25,6 +25,11 @@
               send_msg(msg)
           };
 
+          function send_reset() {
+              var msg = "{\"game\": {\"reset\" : true}}";
+              send_msg(msg)
+          };
+
           function cardContextClicked(ev) {
               event.preventDefault();
               var ctxMenu = document.getElementById("ctxMenu");
@@ -59,6 +64,14 @@
 
           function deal_cards(no_cards) {
               send_deal(context_clicked_card, no_cards);
+              cardClicked();
+          }
+
+          function reset_game() {
+              var result = confirm("Reset the game?");
+              if (result == true) {
+                  send_reset();
+              }
               cardClicked();
           }
 
@@ -257,6 +270,7 @@
               <div class="menu" title="5" onclick="deal_cards(5)"></div>
           </div>
           <div class="menu" title="Flip" onclick="flip_stack()"></div>
+          <div class="menu" title="Reset" onclick="reset_game()"></div>
       </div>
       <div id="gamestate"></div>
       <div id="hands"></div>

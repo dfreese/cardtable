@@ -135,15 +135,6 @@ class BroadcastServerFactory(WebSocketServerFactory):
         self.send_players()
 
 
-def updateWsAddress(filename, envvar):
-    filedata = None
-    with open(filename, 'r') as file:
-        filedata = file.read()
-    filedata.replace(envvar, os.getenv(envvar, 'localhost'))
-    with open(filename, 'w') as file:
-        file.write(filedata)
-
-
 if __name__ == '__main__':
     factory = BroadcastServerFactory(u"ws://127.0.0.1:9000")
     factory.protocol = BroadcastServerProtocol
