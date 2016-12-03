@@ -170,7 +170,7 @@
 
          window.onload = function() {
 
-            var wsuri = "ws://DOCKERCLOUD_CONTAINER_FQDN:9000";
+            var wsuri = "ws://DOCKERCLOUD_SERVICE_FQDN:9000";
 
             if ("WebSocket" in window) {
                sock = new WebSocket(wsuri);

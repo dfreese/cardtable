@@ -149,7 +149,8 @@ if __name__ == '__main__':
     factory.protocol = BroadcastServerProtocol
     listenWS(factory)
 
-    fileupdate.updateWsAddress('/cardtable/index.html', 'DOCKERCLOUD_CONTAINER_FQDN')
+    fileupdate.updateWsAddress('/cardtable/index.html',
+            'DOCKERCLOUD_SERVICE_FQDN')
 
     webdir = File("/cardtable/")
     web = Site(webdir)
