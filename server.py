@@ -28,7 +28,6 @@
 
 # import sys
 import json
-import os
 
 from twisted.internet import reactor
 from twisted.python import log
@@ -41,6 +40,7 @@ from autobahn.twisted.websocket import (
     listenWS)
 
 import game
+import fileupdate
 
 class BroadcastServerProtocol(WebSocketServerProtocol):
 
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     factory.protocol = BroadcastServerProtocol
     listenWS(factory)
 
-    updateWsAddress('/cardtable/index.html', 'DOCKERCLOUD_CONTAINER_FQDN')
+    fileupdate.updateWsAddress('/cardtable/index.html', 'DOCKERCLOUD_CONTAINER_FQDN')
 
     webdir = File("/cardtable/")
     web = Site(webdir)
