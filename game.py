@@ -214,6 +214,7 @@ class Game:
                     for card_idx in range(no_cards):
                         for idx in hand_order:
                             hand = self.hands[idx]
+                            hand.set_face_up(True)
                             hand.push_card(stack.pop_card())
             elif id_split[0][0] == 'h':
                 pass
