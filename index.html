@@ -63,7 +63,7 @@
           }
 
           function get_card_name(card) {
-              var str = "cards/" + card.value + "_of_" + card.suit + ".png"
+              var str = "images/" + card.value + "_of_" + card.suit + ".png"
               return(str)
           };
 
@@ -170,13 +170,7 @@
 
          window.onload = function() {
 
-            var wsuri;
-
-            if (window.location.protocol === "file:") {
-                wsuri = "ws://localhost:9000";
-            } else {
-                wsuri = "ws://98.234.179.121:9000";
-            }
+            var wsuri = "ws://DOCKERCLOUD_CONTAINER_FQDN:9000";
 
             if ("WebSocket" in window) {
                sock = new WebSocket(wsuri);

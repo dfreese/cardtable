@@ -28,6 +28,7 @@
 
 # import sys
 import json
+import os
 
 from twisted.internet import reactor
 from twisted.python import log
@@ -133,12 +134,25 @@ class BroadcastServerFactory(WebSocketServerFactory):
         self.names[client_idx] = name
         self.send_players()
 
+
+def updateWsAddress(filename, envvar):
+    filedata = None
+    with open(filename, 'r') as file:
+        filedata = file.read()
+    filedata.replace(envvar, os.getenv(envvar, 'localhost'))
+    with open(filename, 'w') as file:
+        file.write(filedata)
+
+
 if __name__ == '__main__':
     factory = BroadcastServerFactory(u"ws://127.0.0.1:9000")
     factory.protocol = BroadcastServerProtocol
     listenWS(factory)
 
-    webdir = File(".")
+    updateWsAddress('/cardtable/index.html', 'DOCKERCLOUD_CONTAINER_FQDN')
+
+    webdir = File("/cardtable/")
     web = Site(webdir)
     reactor.listenTCP(8080, web)
     reactor.run()
+
